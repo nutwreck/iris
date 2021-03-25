@@ -1,10 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Dashboard extends CI_Controller {
+class Website extends CI_Controller {
 
     public function __construct(){
-		parent::__construct();
+        parent::__construct();
+        $this->load->model('Website_model','website');
     }
 
     private function _generate_view($view, $data){
@@ -12,6 +13,7 @@ class Dashboard extends CI_Controller {
         if(!empty($view['css_additional'])) {
             $this->load->view($view['css_additional']);
         }
+        $this->load->view('_template/menu');
         $this->load->view($view['content'], $data['content']);
         $this->load->view('_template/js_main');
         if(!empty($view['js_additional'])) {
@@ -20,10 +22,10 @@ class Dashboard extends CI_Controller {
         $this->load->view('_template/footer');
     }
 
-    public function index(){
+    public function dashboard(){
         //for passing data to view
         $data['content'] = [];
-        $data['title_header'] = ['title' => 'Login Page'];
+        $data['title_header'] = ['title' => 'Dashboard Page'];
 
         //for load view
         $view['css_additional'] = 'dashboard/css';
@@ -32,5 +34,24 @@ class Dashboard extends CI_Controller {
 
         //get function view website
         $this->_generate_view($view, $data);
+    }
+
+    public function upload_data(){
+        //for passing data to view
+        $data['content']['activity_type_data'] = $this->website->get_activity_type_enable();
+        $data['content']['region_data'] = $this->website->get_region_enable();
+        $data['title_header'] = ['title' => 'Upload Report Page'];
+
+        //for load view
+        $view['css_additional'] = 'upload_data/css';
+        $view['content'] = 'upload_data/content';
+        $view['js_additional'] = 'upload_data/js';
+
+        //get function view website
+        $this->_generate_view($view, $data);
+    }
+
+    public function report(){
+
     }
 }

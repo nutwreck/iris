@@ -33,4 +33,8 @@ class Login extends CI_Controller {
         //get function view website
         $this->_generate_view($view, $data);
     }
+
+    public function logout(){
+        
+    }
 }

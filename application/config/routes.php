@@ -55,5 +55,8 @@ $route['javascript-not-available'] = 'JS_detect';
 $route['translate_uri_dashes'] = FALSE;
 
 $route['login'] = 'Login';
-$route['dashboard'] = 'Dashboard';
+$route['login/logout'] = 'logout';
+$route['dashboard'] = 'Website/dashboard';
+$route['upload-data'] = 'Website/upload_data';
+$route['report'] = 'Website/report';
 

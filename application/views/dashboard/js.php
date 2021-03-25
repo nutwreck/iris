@@ -1,23 +1,42 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
 
 <script>
-    new Chart(document.getElementById("bar-chart-horizontal"), {
-        type: 'horizontalBar',
-        data: {
-            labels: ["Africa", "Asia", "Europe", "Latin America", "North America"],
+    var data = {
+            labels: ["Jakarta", "Bali", "Jawa Tengah", "Jawa Barat", "Kalimantan Tengah"],
             datasets: [
                 {
-                    label: "Population (millions)",
-                    backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+                    label: "DOR",
+                    backgroundColor: ["#0000CD", "#0000CD","#0000CD","#0000CD","#0000CD"],
                     data: [2478,5267,734,784,433]
+                },
+                {
+                    label: "WOR",
+                    backgroundColor: ["#FF8C00", "#FF8C00","#FF8C00","#FF8C00","#FF8C00"],
+                    data: [2600,6000,800,800,500]
                 }
             ]
-        },
+        };
+    new Chart(document.getElementById("bar-chart-horizontal"), {
+        type: 'horizontalBar',
+        data: data,
         options: {
-            legend: { display: false },
+            legend: { 
+                display: true,
+                labels: {
+                    fontColor: 'rgb(0,0,0)'
+                }
+            },
             title: {
                 display: true,
-                text: 'Predicted world population (millions) in 2050'
+                text: 'Report Total DOR & WOR'
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
             }
         }
     });
