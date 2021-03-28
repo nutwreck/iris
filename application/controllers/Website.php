@@ -52,6 +52,17 @@ class Website extends CI_Controller {
     }
 
     public function report(){
+        //for passing data to view
+        $data['content'] = [];
+        $data['content'] = [];
+        $data['title_header'] = ['title' => 'Report Page'];
 
+        //for load view
+        $view['css_additional'] = 'report_data/css';
+        $view['content'] = 'report_data/content';
+        $view['js_additional'] = 'report_data/js';
+
+        //get function view website
+        $this->_generate_view($view, $data);
     }
 }
