@@ -15,4 +15,9 @@ class Website_model extends CI_Model{
                     ->get_where('region', array('is_enable' => 1))->result();
     }
 
+    public function get_username($username){
+        return $this->db->select('username')
+                    ->get_where('user', array('username' => $username))->result();
+    }
+
 }

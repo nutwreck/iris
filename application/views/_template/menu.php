@@ -13,14 +13,8 @@
                     <a href="<?=base_url()?>dashboard" class="nav-item nav-link active">Dashboard</a>
                     <a href="<?=base_url()?>upload-data" class="nav-item nav-link">Upload Data</a>
                     <a href="<?=base_url()?>report" class="nav-item nav-link">Report</a>
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Messages</a>
-                        <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item">Inbox</a>
-                            <a href="#" class="dropdown-item">Sent</a>
-                            <a href="#" class="dropdown-item">Drafts</a>
-                        </div>
-                    </div>
+                    <a href="<?=base_url()?>access-user" class="nav-item nav-link">Akses User</a>
+                    <!-- <a href="<?=base_url()?>change-access" class="nav-item nav-link">Profile</a> -->
                 </div>
                 <div class="navbar-nav">
                     <a href="#" class="nav-item nav-link">Hi, Candra</a>
