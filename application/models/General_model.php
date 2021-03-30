@@ -63,10 +63,13 @@ class General_model extends CI_Model{
 
     function login_admin($data){
 		$query = $this->db->query("
-            SELECT  id ,
+            SELECT  id_user,
+                role_id,
+                role_name,
+                name_user,
                 username,
                 password
-					FROM admin
+					FROM v_user
 					WHERE username = '".$data['username']."'
 				");
 		$num = $query->num_rows();

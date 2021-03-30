@@ -3,8 +3,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Website extends CI_Controller {
 
-    public function __construct(){
+    function __construct(){
         parent::__construct();
+        if (!$this->session->has_userdata('has_login')){
+            redirect('login');
+        }
         $this->load->model('Website_model','website');
     }
 

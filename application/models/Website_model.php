@@ -20,4 +20,13 @@ class Website_model extends CI_Model{
                     ->get_where('user', array('username' => $username))->result();
     }
 
+    public function get_role_user_selected($id){
+        return $this->db->select('id, name')
+                    ->get_where('role_user', array('id !=' => $id))->result();
+    }  
+
+    public function get_user_by_id($tbl, $id){
+        return $this->db->get_where($tbl, array('id_user' => $id))->row();
+    }
+
 }
