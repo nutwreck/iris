@@ -77,16 +77,16 @@ class Website extends CI_Controller {
             'new_image' => $target_path,
             'maintain_ratio' => TRUE,
             'quality' => '60%',
-            'width' => 500
+            'width' => 700
         );
     
         $this->load->library('image_lib');
         $this->image_lib->initialize($config_compress);  
 
         if (!$this->image_lib->resize()) {
-            echo $this->image_lib->display_errors();
-            die();
-            /* return null; */
+            /* echo $this->image_lib->display_errors();
+            die(); */
+            return null;
         }
     
         $this->image_lib->clear();
