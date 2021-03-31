@@ -3,12 +3,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Website extends CI_Controller {
 
+    private $tbl_report = 'report';
+
     function __construct(){
         parent::__construct();
         if (!$this->session->has_userdata('has_login')){
             redirect('login');
         }
         $this->load->model('Website_model','website');
+        $this->load->model('General_model','general');
     }
 
     private function _generate_view($view, $data){
@@ -23,6 +26,71 @@ class Website extends CI_Controller {
             $this->load->view($view['js_additional']);
         }
         $this->load->view('_template/footer');
+    }
+
+    private function input_end($input, $urly, $urlx){
+        if(!empty($input)){
+            $this->session->set_flashdata('success', 'Data berhasil ditambahkan');
+		    redirect($urly);
+        } else {
+            $this->session->set_flashdata('error', 'Data gagal disimpan!');
+		    redirect($urlx);
+        }
+    }
+
+    private function update_end($update, $urly, $urlx){
+        if(!empty($update)){
+            $this->session->set_flashdata('success', 'Data berhasil diedit');
+		    redirect($urly);
+        } else {
+            $this->session->set_flashdata('error', 'Data gagal terupdate!');
+		    redirect($urlx);
+        }
+    }
+
+    private function delete_end($delete, $urly, $urlx){
+        if(!empty($delete)){
+            $this->session->set_flashdata('success', 'Data berhasil dinonaktifkan');
+		    redirect($urly);
+        } else {
+            $this->session->set_flashdata('error', 'Data gagal ternonaktifkan!');
+		    redirect($urlx);
+        }
+    }
+
+    private function active_end($active, $urly, $urlx){
+        if(!empty($active)){
+            $this->session->set_flashdata('success', 'Data berhasil diaktifkan');
+		    redirect($urly);
+        } else {
+            $this->session->set_flashdata('error', 'Data gagal diaktifkan!');
+		    redirect($urlx);
+        }
+    }
+
+    public function resizeImage($filename) {
+        $source_path = FCPATH.'storage/website/report_image/raw/' . $filename;
+        $target_path = FCPATH.'storage/website/report_image/';
+        $config_compress = array(
+            'image_library' => 'gd2',
+            'source_image' => $source_path,
+            'new_image' => $target_path,
+            'maintain_ratio' => TRUE,
+            'quality' => '60%',
+            'width' => 500
+        );
+    
+        $this->load->library('image_lib');
+        $this->image_lib->initialize($config_compress);  
+
+        if (!$this->image_lib->resize()) {
+            echo $this->image_lib->display_errors();
+            die();
+            /* return null; */
+        }
+    
+        $this->image_lib->clear();
+        return 1;
     }
 
     public function dashboard(){
@@ -52,6 +120,83 @@ class Website extends CI_Controller {
 
         //get function view website
         $this->_generate_view($view, $data);
+    }
+
+    public function submit_upload_data(){
+        $data = [];
+        $region = $this->input->post('region', TRUE);
+        $activity_type = $this->input->post('activity_type', TRUE);
+        $user_upload = $this->session->userdata('name_user');
+
+        $region_implode = explode("|", $region);
+        $activity_type_implode = explode("|", $activity_type);
+        $user_upload_no_space = str_replace(' ','_',$user_upload); 
+
+        $date_time = $this->input->post('datetime', TRUE);
+        $input_date = date("Y-m-d H:i", strtotime($date_time));  
+
+        $data['region_id'] = $region_implode[0];
+        $data['region_name'] = $region_implode[1];
+        $data['activity_id'] = $activity_type_implode[0];
+        $data['activity_name'] = $activity_type_implode[1];
+        $data['activity_detail'] = $this->input->post('activity', TRUE);
+        $data['datetime'] = $input_date;
+        $data['agenda'] = $this->input->post('agenda', TRUE);
+        $data['brand_name'] = $this->input->post('brand', TRUE);
+        $data['notes'] = $this->input->post('note', TRUE);
+
+        $dname = explode(".", $_FILES['report_image']['name']);
+        $ext = end($dname);
+        $new_name                   = 'iris_'.time().'_'.date('Ymd').'_'.$user_upload_no_space.'.'.$ext;
+        $config['file_name']        = $new_name;
+        $config['upload_path']      = FCPATH.'storage/website/report_image/raw/';
+        $config['allowed_types']    = 'jpeg|jpg|png';
+        $config['overwrite']        = FALSE;
+        $_upload_path = $config['upload_path'];
+
+        if(!file_exists($_upload_path)){
+            mkdir($_upload_path,0777);
+        }
+        
+        $this->load->library('upload', $config);
+
+        if(!empty($_FILES['report_image']['name'])){
+            if (!$this->upload->do_upload('report_image')){
+                /* $error = $this->upload->display_errors();
+                show_error($error, 500, 'File Upload Error');
+                exit(); */
+                if($ext != 'png' || $ext != 'jpg' || $ext != 'jpeg'){
+                    $this->session->set_flashdata('warning', 'Jenis gambar tidak sesuai ketentuan, Ulangi kembali');
+                    redirect('upload-data');
+                } else {
+                    $this->session->set_flashdata('warning', 'Gambar gagal disimpan, Ulangi kembali');
+                    redirect('upload-data');
+                }
+            } else {
+                $file_name = $this->upload->data('file_name');
+                $compress_image = $this->resizeImage($file_name);//lakukkan kompresi gambar
+                if($compress_image){// Jika kompresi gambar sukses
+                    $data['file'] = $file_name;
+                } else {
+                    $this->session->set_flashdata('warning', 'Error saat kompresi gambar, Ulangi kembali');
+		            redirect('upload-data');
+                }
+                //jika sudah terupload/gagal kompresinya, maka file asli dihapus
+                $path = FCPATH.'storage/website/report_image/raw/'.$file_name;
+                chmod($path, 0777);
+                unlink($path);
+            }
+        }
+
+        $data['created_by'] = $this->session->userdata('id_user');
+        $data['created_datetime'] = date('Y-m-d H:i:s');
+
+        $tbl = $this->tbl_report;
+        $input = $this->general->input_data($tbl, $data);
+
+        $urly = 'upload-data';
+        $urlx = 'upload-data';
+        $this->input_end($input, $urly, $urlx);
     }
 
     public function report(){

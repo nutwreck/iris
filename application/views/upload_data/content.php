@@ -7,7 +7,8 @@
         </div>
         <div class="col-sm-12 col-md-6 mt-3">
             <div class="container">
-                <form action="/action_page.php" class="needs-validation" novalidate>
+                <form action="<?=base_url()?>Website/submit_upload_data" class="needs-validation" novalidate method="post" enctype="multipart/form-data">
+                <input type="hidden" id="csrf-hash-form" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>" style="display: none">
                 <div class="form-group">
                     <label for="uname">Region:</label>
                     <select class="form-control selectpicker dropup" name="region" data-header="Select Region" data-live-search="true" required>
@@ -65,9 +66,10 @@
                 <div class="text-center">
                     <img src="<?=config_item('_assets_general')?>images/upload_data.png" class="rounded" alt="upload_data">
                     <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="customFile">
-                        <label class="custom-file-label" for="customFile" name="photo">Select Photo</label>
+                        <input type="file" class="custom-file-input" id="customFile" name="report_image">
+                        <label class="custom-file-label" for="customFile">Select Photo</label>
                     </div>
+                    <small class="bg-warning text-white text-center">Tipe file upload yang diijinkan (PNG, JPG, JPEG) Maksimal ukuran 1MB</small>
                 </div>
             </div>
         </div>
