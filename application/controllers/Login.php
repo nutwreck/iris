@@ -49,19 +49,20 @@ class Login extends CI_Controller {
         $decode = $this->encryption->decrypt($data['login_admin'][0]['password']);
 
 		if($data['login_admin'] && $decode == $data['password']){
-            $this->session->set_flashdata('success', 'Welcome!');
-            
+
 			$newdata = array(
-                    'id_user' => $data['login_admin'][0]['id_user'],
-                    'role_id' => $data['login_admin'][0]['role_id'],
-                    'role_name' => $data['login_admin'][0]['role_name'],
-                    'name_user' => $data['login_admin'][0]['name_user'],
-					'username' => $data['login_admin'][0]['username'],
-					'has_login' => 1
+                'id_user' => $data['login_admin'][0]['id_user'],
+                'role_id' => $data['login_admin'][0]['role_id'],
+                'role_name' => $data['login_admin'][0]['role_name'],
+                'name_user' => $data['login_admin'][0]['name_user'],
+                'username' => $data['login_admin'][0]['username'],
+                'has_login' => 1
 			);
 
 			$this->session->set_userdata($newdata);
-			session_start();
+            session_start();
+            
+            $this->session->set_flashdata('success', 'Welcome '.$data['login_admin'][0]['name_user'].'!');
 
 			redirect("dashboard");
 		}else{

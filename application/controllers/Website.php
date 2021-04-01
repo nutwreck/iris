@@ -76,7 +76,7 @@ class Website extends CI_Controller {
             'source_image' => $source_path,
             'new_image' => $target_path,
             'maintain_ratio' => TRUE,
-            'quality' => '60%',
+            'quality' => '70%',
             'width' => 700
         );
     
@@ -175,16 +175,18 @@ class Website extends CI_Controller {
             } else {
                 $file_name = $this->upload->data('file_name');
                 $compress_image = $this->resizeImage($file_name);//lakukkan kompresi gambar
+
+                //jika sudah terupload/gagal kompresinya, maka file asli dihapus
+                $path = FCPATH.'storage/website/report_image/raw/'.$file_name;
+                chmod($path, 0777);
+                unlink($path);
+                
                 if($compress_image){// Jika kompresi gambar sukses
                     $data['file'] = $file_name;
                 } else {
                     $this->session->set_flashdata('warning', 'Error saat kompresi gambar, Ulangi kembali');
 		            redirect('upload-data');
                 }
-                //jika sudah terupload/gagal kompresinya, maka file asli dihapus
-                $path = FCPATH.'storage/website/report_image/raw/'.$file_name;
-                chmod($path, 0777);
-                unlink($path);
             }
         }
 

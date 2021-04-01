@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <style type="text/css">
     .table-report {
         height: auto;overflow: scroll;
@@ -39,13 +41,6 @@
         color: #FFFFFF;
         padding: 2px 8px;
         border-radius: 5px;
-    }
-    .search__container {
-        text-align: right;
-        margin: 1% 0 1% 0;
-    }
-    .search__input {
-
     }
 }
 </style>
