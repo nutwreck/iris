@@ -29,4 +29,15 @@ class Website_model extends CI_Model{
         return $this->db->get_where($tbl, array('id_user' => $id))->row();
     }
 
+    public function get_search_data_report($data){
+        return  $this->db->select('*')
+                        ->get_where('v_report', 
+                                    array(
+                                        'region_id' => $data['region_id'],
+                                        'datetime >=' => $data['start_date'],
+                                        'datetime <=' => $data['end_date']
+                                    )
+                                )->result();
+    }
+
 }

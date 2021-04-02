@@ -8,17 +8,19 @@
         <div class="col-sm-12 col-md-6 mt-3">
             <div class="container">
                 <h4>Filter Data</h4>
+                <form id="formsearch" name="formsearch" action="<?=base_url()?>search-report" method="POST" onsubmit="return(validate_searchform());">
+                <input type="hidden" id="csrf-hash-form" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>" style="display: none">
                 <table class="table-bordered text-center p-1">
                     <tr>
                         <td class="bg-primary text-white" width="30%">Region : </td>
                         <td>
-                            <select class="form-control selectpicker dropup" data-header="Select Region" name="region_name" required>
-                                <!-- <?php foreach($activity_type_data as $val_at){ ?>
-                                    <option value="<?=$val_at->id?>|<?=$val_at->name?>"><?=$val_at->name?></option>
-                                <?php } ?> -->
+                            <select class="form-control selectpicker dropup" data-header="Select Region" data-live-search ="true" id="region_name" name="region_name" onchange="open_export()">
                                 <option value="-1">Pilih</option>
-                                <option value="90">Banjarmasin</option>
+                                <?php foreach($region as $val_region){ ?>
+                                    <option data-tokens="<?=$val_region->name?>" value="<?=$val_region->id?>|<?=$val_region->name?>"><?=$val_region->name?></option>
+                                <?php } ?>
                             </select>
+                            <small for="region_name" id="region_name_er" class="bg-danger text-white"></small>
                         </td>
                     </tr>
                     <tr>
@@ -26,21 +28,20 @@
                         <td>
                             <div id="reportrange">
                                 <input type="text" id="daterange" class="form-control text-center" name="daterange"/>
-                                <span></span>
-                                <input type="hidden" name="to" id="to" value="">
-                                <input type="hidden" name="from" id="from" value="">
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2" class="text-right">
                             <div class="btn-group">
-                                <a href="" class="btn btn-sm btn-success m-1">Export Excel</a>
-                                <a href="#" id="search" class="btn btn-sm btn-primary m-1" onclick="search_data()">Search</a>
+                                <input type="hidden" id="typebutton" class="form-control text-center" name="typebutton" value="1"/>
+                                <button id="exportexcel" class="btn btn-sm btn-success m-1" onclick="export_excel()">Export Excel</button>
+                                <button type="submit" class="btn btn-sm btn-primary m-1">Search</button>
                             </div>
                         </td>
                     </tr>
                 </table>
+                </form>
             </div>
         </div>
         <div class="col-sm-12 col-md-6" style="margin-top:4.5%;">

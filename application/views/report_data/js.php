@@ -19,7 +19,7 @@
             startDate: moment().subtract(6, 'days'),
             endDate: moment(),
             locale: {
-                format: 'DD/MM/YYYY'
+                format: 'YYYY/MM/DD'
             },
             ranges: {
                 'Today': [moment(), moment()],
@@ -28,19 +28,44 @@
                 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                 'This Month': [moment().startOf('month'), moment().endOf('month')],
                 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            },
-            function(start, end) {
-                console.log("Callback has been called!");
-                $('#reportrange span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                $('#to').val(start.format('YYYY-MM-DD'));
-                $('#from').val(end.format('YYYY-MM-DD'));
             }
+            /* ,
+            function(start, end) {
+                $('#from').val(start.format('YYYY-MM-DD'));
+                $('#to').val(end.format('YYYY-MM-DD'));
+            } */
         });
+
+        var region_name = document.getElementById("region_name").value;
+        if( region_name == "-1" ) {
+            document.getElementById("exportexcel").disabled = true;
+        }
     });
 </script>
 
+<script type="text/javascript">
+    function export_excel() {
+        var a = document.getElementById("typebutton").value = 2; //1 Submit 2 Export Excel
+        validate_searchform();
+    }
+
+    function open_export(){
+        var region_name = document.getElementById("region_name").value;
+        if( region_name == "-1" ) {
+            document.getElementById("exportexcel").disabled = true;
+        } else {
+            document.getElementById("exportexcel").disabled = false;
+        }
+    }
+</script>
+
 <script>
-    function search_data(){
-        
+    function validate_searchform(){
+        if( document.formsearch.region_name.value == "-1" ) {
+            document.getElementById('region_name_er').innerHTML = 'Region Wajib Dipilih!';
+            document.formsearch.region_name.focus();
+            return false;
+        }
+        return( true );
     }
 </script>

@@ -203,8 +203,7 @@ class Website extends CI_Controller {
 
     public function report(){
         //for passing data to view
-        $data['content'] = [];
-        $data['content'] = [];
+        $data['content']['region'] = $this->website->get_region_enable();
         $data['title_header'] = ['title' => 'Report Page'];
 
         //for load view
@@ -214,5 +213,35 @@ class Website extends CI_Controller {
 
         //get function view website
         $this->_generate_view($view, $data);
+    }
+
+    public function search_report(){
+        $type_button = $this->input->post('typebutton', TRUE); //1 Submit 2 Export Excel
+        
+        $region = $this->input->post('region_name', TRUE);
+        $region_raw = explode("|", $region);
+
+        $daterange = $this->input->post('daterange', TRUE);
+        $split = explode('-', $daterange);
+
+        #check make sure have 2 elements in array
+        $count = count($split);
+        if($count <> 2){ #invalid data
+            $this->session->set_flashdata('warning', 'Error saat memproses tanggal report, ulangi kembali!');
+            redirect('report');
+        }
+
+        $data['region_id'] = $region_raw[0];
+        $data['region_name'] = $region_raw[1];
+        $data['start_date'] = str_replace('/', '-', $split[0]).' 00:00:00';
+        $data['end_date'] = str_replace('/', '-', $split[1]).' 00:00:00';
+
+        $get_data = $this->website->get_search_data_report($data);
+
+        if($type_button == 1){ //Submit
+
+        } else { //Export Excel
+            
+        }
     }
 }

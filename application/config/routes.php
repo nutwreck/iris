@@ -65,4 +65,5 @@ $route['active-user/(:num)'] = 'Access/active_access_user/$1';
 $route['dashboard'] = 'Website/dashboard';
 $route['upload-data'] = 'Website/upload_data';
 $route['report'] = 'Website/report';
+$route['search-report'] = 'Website/search_report';
 
