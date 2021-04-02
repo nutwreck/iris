@@ -9,7 +9,6 @@
             <div class="container">
                 <h4>Filter Data</h4>
                 <form id="formsearch" name="formsearch" action="<?=base_url()?>search-report" method="POST" onsubmit="return(validate_searchform());">
-                <input type="hidden" id="csrf-hash-form" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>" style="display: none">
                 <table class="table-bordered text-center p-1">
                     <tr>
                         <td class="bg-primary text-white" width="30%">Region : </td>
@@ -46,8 +45,8 @@
         </div>
         <div class="col-sm-12 col-md-6" style="margin-top:4.5%;">
             <div class="alert alert-info">
-                <p>
-                    Export excel hanya bisa dilakukkan dengan memilih salah satu <b>Region</b>.
+                <p class="m-0">
+                    Export excel & view data hanya bisa dilakukkan dengan memilih salah satu <b>Region</b>.
                 </p>
             </div>
         </div>

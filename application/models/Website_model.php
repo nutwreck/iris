@@ -30,14 +30,10 @@ class Website_model extends CI_Model{
     }
 
     public function get_search_data_report($data){
+        $this->db->where('region_id', $data['region_id']);
+        $this->db->where("datetime BETWEEN '".$data['start_date']."' AND '".$data['end_date']."'","", FALSE);
         return  $this->db->select('*')
-                        ->get_where('v_report', 
-                                    array(
-                                        'region_id' => $data['region_id'],
-                                        'datetime >=' => $data['start_date'],
-                                        'datetime <=' => $data['end_date']
-                                    )
-                                )->result();
+                        ->get('v_report')->result_array();
     }
 
 }

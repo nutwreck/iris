@@ -8,6 +8,9 @@ class Login extends CI_Controller {
 
     public function __construct(){
         parent::__construct();
+        if ($this->session->has_userdata('has_login')){
+            redirect('dashboard');
+        }
         $this->load->library('encryption');
         $this->load->model('General_model','general');
     }

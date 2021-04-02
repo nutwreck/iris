@@ -1,8 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Website extends CI_Controller {
+require('./vendor/autoload.php');
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+class Website extends CI_Controller {
+    
     private $tbl_report = 'report';
 
     function __construct(){
@@ -216,6 +221,8 @@ class Website extends CI_Controller {
     }
 
     public function search_report(){
+        $data = [];
+
         $type_button = $this->input->post('typebutton', TRUE); //1 Submit 2 Export Excel
         
         $region = $this->input->post('region_name', TRUE);
@@ -234,14 +241,89 @@ class Website extends CI_Controller {
         $data['region_id'] = $region_raw[0];
         $data['region_name'] = $region_raw[1];
         $data['start_date'] = str_replace('/', '-', $split[0]).' 00:00:00';
-        $data['end_date'] = str_replace('/', '-', $split[1]).' 00:00:00';
+        $data['end_date'] = str_replace('/', '-', $split[1]).' 23:59:59';
 
         $get_data = $this->website->get_search_data_report($data);
 
         if($type_button == 1){ //Submit
 
         } else { //Export Excel
-            
+            $this->export_report($get_data);
         }
+    }
+
+    private function export_report($get_data){
+        $year = $get_data[0]['year'];
+        $region = $get_data[0]['region_name'];
+
+        $group_data = array();
+
+        foreach ($get_data as $value_group) {
+            $group_data[$value_group['month_year']][$value_group['week']][$value_group['full_date']][$value_group['day']][] = $value_group;
+        }
+
+        $spreadsheet = new Spreadsheet;
+
+        $active_sheet = 0;
+        foreach($group_data as $key_month => $val_month){
+            $month_year = $key_month;
+            foreach($val_month as $key_week => $val_week){
+                //Create sheet
+                $spreadsheet->createSheet();
+                $spreadsheet->setActiveSheetIndex($active_sheet);
+                $spreadsheet->getActiveSheet()->setTitle('WEEK '.$key_week);
+                
+                //Create merge cells
+                $spreadsheet->getActiveSheet()->mergeCells('A1:J1')
+                        ->mergeCells('B2:H2')
+                        ->mergeCells('B3:H3')
+                        ->mergeCells('B4:H4')
+                        ->mergeCells('I2:J4');
+    
+                //Header cells
+                $spreadsheet->setActiveSheetIndex($active_sheet)
+                        ->setCellValue('A1', 'Report Documentation')
+                        ->setCellValue('A2', 'Region')
+                        ->setCellValue('A3', 'Week')
+                        ->setCellValue('A4', 'Month')
+                        ->setCellValue('B2', ucwords($region))
+                        ->setCellValue('B3', $key_week)
+                        ->setCellValue('B4', $month_year)
+                        ->setCellValue('A5', 'Month')
+                        ->setCellValue('B5', 'Month')
+                        ->setCellValue('C5', 'Month')
+                        ->setCellValue('D5', 'Month');
+    
+                //Fill data
+                $kolom = 6;
+                foreach($val_week as $val_report) {
+    
+                    $spreadsheet->setActiveSheetIndex($active_sheet)
+                                ->setCellValue('A' . $kolom, ucwords($val_report['activity_name']))
+                                ->setCellValue('B' . $kolom, ucwords($val_report['region_name']))
+                                ->setCellValue('C' . $kolom, ucwords($val_report['activity_detail']))
+                                ->setCellValue('D' . $kolom, ucwords($val_report['brand_name']));
+    
+                    $kolom++;
+    
+                }
+                
+                $active_sheet++;
+            }
+        }
+
+        //Remove initial sheet
+        $sheetIndex = $spreadsheet->getIndex(
+            $spreadsheet->getSheetByName('Worksheet 1')
+        );
+        $spreadsheet->removeSheetByIndex($sheetIndex);
+
+        $writer = new Xlsx($spreadsheet);
+
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="REPORT DOCUMENTATION - DOR_WOR_MOR SAMPLING '.$year.' '.strtoupper($region).'.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
     }
 }
