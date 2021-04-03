@@ -259,9 +259,9 @@ class Website extends CI_Controller {
         $group_data = array();
 
         foreach ($get_data as $value_group) {
-            $group_data[$value_group['month_year']][$value_group['week']][$value_group['full_date']][$value_group['day']][] = $value_group;
+            $group_data[$value_group['month_year']][$value_group['week']][] = $value_group;
         }
-
+        
         $spreadsheet = new Spreadsheet;
 
         $active_sheet = 0;
@@ -289,26 +289,211 @@ class Website extends CI_Controller {
                         ->setCellValue('B2', ucwords($region))
                         ->setCellValue('B3', $key_week)
                         ->setCellValue('B4', $month_year)
-                        ->setCellValue('A5', 'Month')
-                        ->setCellValue('B5', 'Month')
-                        ->setCellValue('C5', 'Month')
-                        ->setCellValue('D5', 'Month');
+                        ->setCellValue('A5', 'Day')
+                        ->setCellValue('B5', 'Date')
+                        ->setCellValue('C5', 'Time')
+                        ->setCellValue('D5', 'Brand')
+                        ->setCellValue('E5', 'Name')
+                        ->setCellValue('F5', 'Activity Type')
+                        ->setCellValue('G5', 'Activity Detail')
+                        ->setCellValue('H5', 'Agenda')
+                        ->setCellValue('I5', 'Remarks')
+                        ->setCellValue('J5', 'Photo');
+
+                $sheet = $spreadsheet->setActiveSheetIndex($active_sheet);
+
+                //Height Column
+                $sheet->getRowDimension('1')->setRowHeight(25);
+                $sheet->getRowDimension('5')->setRowHeight(15);
+
+                $styleArray_border = [
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                ];
+
+                $styleArray_head = array(
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'rotation' => 90,
+                        'startColor' => [
+                            'argb' => 'FFBDD7EE',
+                        ],
+                        'endColor' => [
+                            'argb' => 'FFBDD7EE',
+                        ],
+                    ],
+                );
+
+                //Color Bg cell Header
+                $sheet->getStyle('A5:J5')->applyFromArray($styleArray_head);
+                $sheet->getStyle('A1')->applyFromArray($styleArray_head);
+
+                //Header Top Font Size
+                $sheet->getStyle('A1')->getFont()->setSize(15);
+
+                //Border
+                $sheet->getStyle('A1:J5')->applyFromArray($styleArray_border);
+
+                //Middle Align
+                $sheet->getStyle('A1')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A1')
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('A2')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('A3')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('A4')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('B2')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('B3')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('B4')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('A5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A5')
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('B5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('C5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('D5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('E5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('F5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('G5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('H5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('I5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('J5')
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     
                 //Fill data
-                $kolom = 6;
-                foreach($val_week as $val_report) {
-    
-                    $spreadsheet->setActiveSheetIndex($active_sheet)
-                                ->setCellValue('A' . $kolom, ucwords($val_report['activity_name']))
-                                ->setCellValue('B' . $kolom, ucwords($val_report['region_name']))
-                                ->setCellValue('C' . $kolom, ucwords($val_report['activity_detail']))
-                                ->setCellValue('D' . $kolom, ucwords($val_report['brand_name']));
-    
-                    $kolom++;
-    
+                $row = 6;
+                $startRowDay = -1;
+                $previousKeyDay = '';
+                $startRowDate = -1;
+                $previousKeyDate = '';
+
+                foreach($val_week as $index => $val_report) {
+                    //Fill Data
+                    //Merge Day
+                    if($startRowDay == -1){
+                        $startRowDay = $row;
+                        $previousKeyDay = $val_report['day'];
+                    }
+                    $sheet->setCellValue('A' . $row, ucwords($val_report['day']));
+                    $nextKeyDay = isset($val_week[$index+1]) ? $val_week[$index+1]['day'] : null;
+                        if($row >= $startRowDay && (($previousKeyDay <> $nextKeyDay) || ($nextKeyDay == null))){
+                            $cellToMergeDay = 'A'.$startRowDay.':A'.$row;
+                            $spreadsheet->getActiveSheet()->mergeCells($cellToMergeDay);
+                            $startRowDay = -1;
+                        }
+                    
+                    //Merge Date
+                    if($startRowDate == -1){
+                        $startRowDate = $row;
+                        $previousKeyDate = $val_report['full_date'];
+                    }
+                    $sheet->setCellValue('B' . $row, format_indo($val_report['full_date']));
+                    $nextKeyDate = isset($val_week[$index+1]) ? $val_week[$index+1]['full_date'] : null;
+                        if($row >= $startRowDate && (($previousKeyDate <> $nextKeyDate) || ($nextKeyDate == null))){
+                            $cellToMergeDate = 'B'.$startRowDate.':B'.$row;
+                            $spreadsheet->getActiveSheet()->mergeCells($cellToMergeDate);
+                            $startRowDate = -1;
+                        }
+
+                    $sheet->setCellValue('C' . $row, $val_report['full_time']);
+                    $sheet->setCellValue('D' . $row, $val_report['brand_name']);
+                    $sheet->setCellValue('E' . $row, $val_report['team']);
+                    $sheet->setCellValue('F' . $row, $val_report['activity_name']);
+                    $sheet->setCellValue('G' . $row, $val_report['activity_detail']);
+                    $sheet->setCellValue('H' . $row, $val_report['agenda']);
+                    $sheet->setCellValue('I' . $row, $val_report['notes']);
+
+                    //File photo report
+                    $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                    $drawing->setName('File Report');
+                    $drawing->setDescription('File Report');
+                    $drawing->setPath('storage/website/report_image/'.$val_report['file']);
+                    $drawing->setCoordinates('J'.$row);
+                    $drawing->setResizeProportional(false);
+                    $drawing->setWidth(200);
+                    $drawing->setHeight(100);
+                    $drawing->setWorksheet($sheet);
+                    //End Fill Data
+
+                    //Height Column
+                    $sheet->getRowDimension($row)->setRowHeight(75);
+                    
+                    //Width Column
+                    $sheet->getColumnDimension('A')->setWidth(10);
+                    $sheet->getColumnDimension('B')->setWidth(14);
+                    $sheet->getColumnDimension('C')->setWidth(6);
+                    $sheet->getColumnDimension('D')->setWidth(12);
+                    $sheet->getColumnDimension('E')->setWidth(50);
+                    $sheet->getColumnDimension('F')->setWidth(14);
+                    $sheet->getColumnDimension('G')->setWidth(20);
+                    $sheet->getColumnDimension('H')->setWidth(25);
+                    $sheet->getColumnDimension('I')->setWidth(75);
+                    $sheet->getColumnDimension('J')->setWidth(28.5); //Untuk ukuran kolom photo
+
+                    //Wrap Text
+                    $sheet->getStyle('D'. $row)->getAlignment()->setWrapText(true);
+                    $sheet->getStyle('E'. $row)->getAlignment()->setWrapText(true);
+                    $sheet->getStyle('G'. $row)->getAlignment()->setWrapText(true);
+                    $sheet->getStyle('H'. $row)->getAlignment()->setWrapText(true);
+                    $sheet->getStyle('I'. $row)->getAlignment()->setWrapText(true);
+
+                    //Middle Align
+                    $sheet->getStyle('A'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('B'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('C'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('D'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('E'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('F'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('G'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('H'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle('I'. $row)
+                    ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+                    $sheet->getStyle('A'.$row.':J'.$row)->applyFromArray($styleArray_border);
+
+                    $row++;
                 }
                 
-                $active_sheet++;
+                //Logo Iris
+                $drawing2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                $drawing2->setName('Logo Report');
+                $drawing2->setDescription('Logo Report');
+                $drawing2->setPath('assets/general/favicon/favicon.png');
+                $drawing2->setCoordinates('I2');
+                $drawing2->setResizeProportional(false);
+                $drawing2->setOffsetX(300);
+                $drawing2->setOffsetY(5);
+                $drawing2->setWidth(100);
+                $drawing2->setHeight(50);
+                $drawing2->setWorksheet($sheet);
+
+                $active_sheet++; //Active Sheet
             }
         }
 
@@ -318,6 +503,9 @@ class Website extends CI_Controller {
         );
         $spreadsheet->removeSheetByIndex($sheetIndex);
 
+        //Sheet aktif diawal
+        $spreadsheet->setActiveSheetIndex(0);
+
         $writer = new Xlsx($spreadsheet);
 
         header('Content-Type: application/vnd.ms-excel');
@@ -326,4 +514,5 @@ class Website extends CI_Controller {
 
         $writer->save('php://output');
     }
+    
 }
