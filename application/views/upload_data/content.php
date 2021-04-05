@@ -10,7 +10,7 @@
                 <form action="<?=base_url()?>Website/submit_upload_data" class="needs-validation" novalidate method="post" enctype="multipart/form-data">
                 <input type="hidden" id="csrf-hash-form" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>" style="display: none">
                 <div class="form-group">
-                    <label for="uname">Region:</label>
+                    <label for="region">Region:</label>
                     <select class="form-control selectpicker dropup" name="region" data-header="Select Region" data-live-search="true" required>
                         <?php foreach($region_data as $val_region){ ?>
                             <option data-tokens="<?=$val_region->name?>" value="<?=$val_region->id?>|<?=$val_region->name?>"><?=$val_region->name?></option>
@@ -20,7 +20,7 @@
                     <div class="invalid-feedback">Harus pilih type aktifitas.</div>
                 </div>
                 <div class="form-group">
-                    <label for="uname">Activity Type:</label>
+                    <label for="activity_type">Activity Type:</label>
                     <select class="form-control selectpicker dropup" data-header="Select Activity Type" name="activity_type" required>
                         <?php foreach($activity_type_data as $val_at){ ?>
                             <option value="<?=$val_at->id?>|<?=$val_at->name?>"><?=$val_at->name?></option>
@@ -30,31 +30,37 @@
                     <div class="invalid-feedback">Harus pilih type aktifitas.</div>
                 </div>
                 <div class="form-group">
-                    <label for="pwd">DateTime:</label>
+                    <label for="datetimepicker">DateTime:</label>
                     <input type="text" class="form-control datetimepicker-input" id="datetimepicker5" data-toggle="datetimepicker" data-target="#datetimepicker5" name="datetime" placeholder="Pilih tanggal dan waktu" required/>
                     <div class="valid-feedback">Valid.</div>
                     <div class="invalid-feedback">Datetime tidak boleh kosong.</div>
                 </div>
                 <div class="form-group">
-                    <label for="pwd">Agenda:</label>
+                    <label for="team">Team:</label>
+                    <input type="text" class="form-control" id="team" placeholder="Masukkan Team" name="team" required>
+                    <div class="valid-feedback">Valid.</div>
+                    <div class="invalid-feedback">Team tidak boleh kosong.</div>
+                </div>
+                <div class="form-group">
+                    <label for="agenda">Agenda:</label>
                     <input type="text" class="form-control" id="agenda" placeholder="Masukkan Agenda" name="agenda" required>
                     <div class="valid-feedback">Valid.</div>
                     <div class="invalid-feedback">Agenda tidak boleh kosong.</div>
                 </div>
                 <div class="form-group">
-                    <label for="pwd">Activity:</label>
+                    <label for="activity">Activity:</label>
                     <input type="text" class="form-control" id="activity" placeholder="Masukkan Aktifitas" name="activity" required>
                     <div class="valid-feedback">Valid.</div>
                     <div class="invalid-feedback">Activity tidak boleh kosong.</div>
                 </div>
                 <div class="form-group">
-                    <label for="pwd">Brand:</label>
+                    <label for="brand">Brand:</label>
                     <input type="text" class="form-control" id="brand" placeholder="Masukkan Brand" name="brand" required>
                     <div class="valid-feedback">Valid.</div>
                     <div class="invalid-feedback">Brand tidak boleh kosong.</div>
                 </div>
                 <div class="form-group">
-                    <label for="pwd">Note:</label>
+                    <label for="note">Note:</label>
                     <textarea class="form-control" id="note" name="note" rows="3" placeholder="Masukkan Catatan" required></textarea>
                     <div class="valid-feedback">Valid.</div>
                     <div class="invalid-feedback">Note tidak boleh kosong.</div>

@@ -1,10 +1,14 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-require('./vendor/autoload.php');
+/* if (file_exists(APPPATH . 'vendor/autoload.php')) {
+    require_once(APPPATH . 'vendor/autoload.php');
+} elseif (file_exists(APPPATH . '../vendor/autoload.php')) {
+    require_once(APPPATH . '../vendor/autoload.php');
+} 
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx; */
 
 class Website extends CI_Controller {
     
@@ -146,6 +150,7 @@ class Website extends CI_Controller {
         $data['activity_name'] = $activity_type_implode[1];
         $data['activity_detail'] = $this->input->post('activity', TRUE);
         $data['datetime'] = $input_date;
+        $data['team'] = $this->input->post('team', TRUE);
         $data['agenda'] = $this->input->post('agenda', TRUE);
         $data['brand_name'] = $this->input->post('brand', TRUE);
         $data['notes'] = $this->input->post('note', TRUE);
