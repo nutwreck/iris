@@ -243,11 +243,10 @@ class Website extends CI_Controller {
         $data['start_date'] = str_replace('/', '-', $split[0]).' 00:00:00';
         $data['end_date'] = str_replace('/', '-', $split[1]).' 23:59:59';
 
-        $get_data = $this->website->get_search_data_report($data);
-
         if($type_button == 1){ //Submit
-
+            $this->search_data_report($data['region_id'], str_replace('/', '-', $split[0]), str_replace('/', '-', $split[1]));
         } else { //Export Excel
+            $get_data = $this->website->get_search_data_report($data);
             $this->export_report($get_data);
         }
     }
@@ -513,6 +512,61 @@ class Website extends CI_Controller {
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
+    }
+
+    public function search_data_report($region_id, $start_date, $end_date){
+        $datas = array(
+            'region_id' => $region_id,
+            'start_date' => $start_date.' 00:00:00',
+            'end_date' => $end_date.' 23:59:59'
+        );
+
+        $this->load->library('pagination');
+        //konfigurasi pagination
+        $config['base_url'] = site_url('Website/search_data_report/'.$region_id.'/'.trim($start_date).'/'.trim($end_date)); //site url
+        $config['total_rows'] = $this->website->count_data_report($datas); //total row
+        $config['per_page'] = 5;  //show record per halaman
+        $config["uri_segment"] = 6;  // uri parameter
+        $choice = $config["total_rows"] / $config["per_page"];
+        $config["num_links"] = floor($choice);
+ 
+        // Membuat Style pagination untuk BootStrap v4
+        $config['first_link']       = 'First';
+        $config['last_link']        = 'Last';
+        $config['next_link']        = 'Next';
+        $config['prev_link']        = 'Prev';
+        $config['full_tag_open']    = '<div class="pagging text-left"><nav><ul class="pagination justify-content-left">';
+        $config['full_tag_close']   = '</ul></nav></div>';
+        $config['num_tag_open']     = '<li class="page-item"><span class="page-link">';
+        $config['num_tag_close']    = '</span></li>';
+        $config['cur_tag_open']     = '<li class="page-item active"><span class="page-link">';
+        $config['cur_tag_close']    = '<span class="sr-only">(current)</span></span></li>';
+        $config['next_tag_open']    = '<li class="page-item"><span class="page-link">';
+        $config['next_tagl_close']  = '<span aria-hidden="true">&raquo;</span></span></li>';
+        $config['prev_tag_open']    = '<li class="page-item"><span class="page-link">';
+        $config['prev_tagl_close']  = '</span>Next</li>';
+        $config['first_tag_open']   = '<li class="page-item"><span class="page-link">';
+        $config['first_tagl_close'] = '</span></li>';
+        $config['last_tag_open']    = '<li class="page-item"><span class="page-link">';
+        $config['last_tagl_close']  = '</span></li>';
+ 
+        $this->pagination->initialize($config);
+        $page = ($this->uri->segment(6)) ? $this->uri->segment(6) : 0;
+        
+        //for passing data to view
+        $data['content']['region'] = $this->website->get_region_enable();
+        $data['content']['all_data'] = $config['total_rows'];
+        $data['content']['data'] = $this->website->get_report_data($config["per_page"], $page, $datas);
+        $data['content']['pagination'] = $this->pagination->create_links();
+        $data['title_header'] = ['title' => 'Report Page'];
+
+        //for load view
+        $view['css_additional'] = 'report_data/css';
+        $view['content'] = 'report_data/content';
+        $view['js_additional'] = 'report_data/js';
+
+        //get function view website
+        $this->_generate_view($view, $data);
     }
     
 }

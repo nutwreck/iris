@@ -36,4 +36,17 @@ class Website_model extends CI_Model{
                         ->get('v_report')->result_array();
     }
 
+    public function get_report_data($limit, $start, $datas){
+        $this->db->where('region_id', $datas['region_id']);
+        $this->db->where("datetime BETWEEN '".$datas['start_date']."' AND '".$datas['end_date']."'","", FALSE);
+        return  $this->db->select('*, RANK() OVER ( ORDER BY T1.id ASC ) AS number', FALSE)
+                        ->get('v_report', $limit, $start)->result_array();
+    }
+
+    public function count_data_report($datas){
+        return $this->db->where('region_id', $datas['region_id'])
+                    ->where("datetime BETWEEN '".$datas['start_date']."' AND '".$datas['end_date']."'","", FALSE)
+                    ->where('is_enable', 1)->from("v_report")->count_all_results();
+    }
+
 }
